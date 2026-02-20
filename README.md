@@ -409,15 +409,7 @@ Contribuições são bem-vindas! Por favor:
 - [Lab Streaming Layer](https://labstreaminglayer.org/) - Protocolo LSL
 - [Muse Headband](https://choosemuse.com/) - Hardware EEG
 
-## 🙏 Agradecimentos
-
-- **Interaxon** pelo Muse headband
-- **Alexandre Barachant** pelo muselsl
-- **FastAPI** pela excelente framework
-- Comunidade open-source de neurociência
-
 ---
 
-Desenvolvido com ❤️ e ☕ para pesquisa em neurociência do sono
-
 **Aviso**: Este software é para fins educacionais e de pesquisa. Não deve ser usado para diagnóstico médico.
+
