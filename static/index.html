@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EEG Monitor - Tempo Real</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.conectado {
+            background: #2e7d32;
+        }
+        .status.desconectado {
+            background: #c62828;
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .values {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .value-card {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .value-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        .value-card .number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .delta { color: #FF6384; }
+        .theta { color: #36A2EB; }
+        .alpha { color: #FFCE56; }
+        .beta { color: #4BC0C0; }
+        
+        .sleep-stage {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .sleep-stage h2 {
+            margin: 0 0 15px 0;
+            font-size: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .sleep-stage .stage-text {
+            font-size: 48px;
+            font-weight: bold;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        .spindle-indicator {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+            border: 3px solid #555;
+            transition: all 0.3s ease;
+        }
+        .spindle-indicator.active {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-color: #f5576c;
+            box-shadow: 0 0 30px rgba(245, 87, 108, 0.6);
+            animation: pulse 0.5s ease-in-out;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .spindle-indicator h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+        .spindle-indicator .spindle-text {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .spindle-indicator .spindle-stats {
+            font-size: 14px;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 EEG Monitor - Tempo Real</h1>
+        <div id="status" class="status desconectado">⚪ Desconectado</div>
+        
+        <div class="sleep-stage">
+            <h2>Estágio de Sono</h2>
+            <div class="stage-text" id="sleep-stage">---</div>
+        </div>
+        
+        <div class="spindle-indicator" id="spindle-indicator">
+            <h3>🌀 Spindle Detection (N2)</h3>
+            <div class="spindle-text" id="spindle-status">Aguardando...</div>
+            <div class="spindle-stats">
+                Sigma: <span id="sigma-power">0.00</span> | 
+                Índice: <span id="spindle-index">0.00</span>x
+            </div>
+        </div>
+        
+        <div class="values">
+            <div class="value-card">
+                <h3 class="delta">Delta (0.5-4 Hz)</h3>
+                <div class="number delta" id="delta-value">0.00</div>
+            </div>
+            <div class="value-card">
+                <h3 class="theta">Theta (4-8 Hz)</h3>
+                <div class="number theta" id="theta-value">0.00</div>
+            </div>
+            <div class="value-card">
+                <h3 class="alpha">Alpha (8-12 Hz)</h3>
+                <div class="number alpha" id="alpha-value">0.00</div>
+            </div>
+            <div class="value-card">
+                <h3 class="beta">Beta (13-30 Hz)</h3>
+                <div class="number beta" id="beta-value">0.00</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="eegChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('eegChart').getContext('2d');
+        const statusEl = document.getElementById('status');
+        
+        // Configuração do gráfico
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: 'Delta',
+                        data: [],
+                        borderColor: '#FF6384',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Theta',
+                        data: [],
+                        borderColor: '#36A2EB',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Alpha',
+                        data: [],
+                        borderColor: '#FFCE56',
+                        backgroundColor: 'rgba(255, 206, 86, 0.1)',
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Beta',
+                        data: [],
+                        borderColor: '#4BC0C0',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        display: false
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#fff'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#fff'
+                        }
+                    }
+                },
+                animation: {
+                    duration: 0
+                }
+            }
+        });
+
+        const maxDataPoints = 30;
+
+        // Conectar ao WebSocket
+        const ws = new WebSocket('ws://localhost:8000/ws/eeg');
+
+        ws.onopen = () => {
+            console.log('✅ Conectado ao EEG');
+            statusEl.textContent = '🟢 Conectado';
+            statusEl.className = 'status conectado';
+        };
+
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const bands = data.bands;
+
+            // Atualizar estágio de sono
+            if (data.sleep_stage) {
+                document.getElementById('sleep-stage').textContent = data.sleep_stage;
+            }
+
+            // Atualizar spindle detector
+            const spindleIndicator = document.getElementById('spindle-indicator');
+            const spindleStatus = document.getElementById('spindle-status');
+            const sigmaPower = document.getElementById('sigma-power');
+            const spindleIndex = document.getElementById('spindle-index');
+            
+            if (data.spindle_detected) {
+                spindleIndicator.classList.add('active');
+                spindleStatus.textContent = '⚡ SPINDLE DETECTADO!';
+            } else {
+                spindleIndicator.classList.remove('active');
+                spindleStatus.textContent = 'Sem spindle';
+            }
+            
+            sigmaPower.textContent = data.sigma_power.toFixed(2);
+            spindleIndex.textContent = data.spindle_index.toFixed(2);
+
+            // Atualizar valores numéricos
+            document.getElementById('delta-value').textContent = bands.delta.toFixed(2);
+            document.getElementById('theta-value').textContent = bands.theta.toFixed(2);
+            document.getElementById('alpha-value').textContent = bands.alpha.toFixed(2);
+            document.getElementById('beta-value').textContent = bands.beta.toFixed(2);
+
+            // Atualizar gráfico
+            chart.data.labels.push('');
+            chart.data.datasets[0].data.push(bands.delta);
+            chart.data.datasets[1].data.push(bands.theta);
+            chart.data.datasets[2].data.push(bands.alpha);
+            chart.data.datasets[3].data.push(bands.beta);
+
+            // Manter apenas os últimos pontos
+            if (chart.data.labels.length > maxDataPoints) {
+                chart.data.labels.shift();
+                chart.data.datasets.forEach(dataset => dataset.data.shift());
+            }
+
+            chart.update();
+        };
+
+        ws.onerror = (error) => {
+            console.error('❌ Erro:', error);
+            statusEl.textContent = '❌ Erro na conexão';
+            statusEl.className = 'status desconectado';
+        };
+
+        ws.onclose = () => {
+            console.log('🔴 Desconectado');
+            statusEl.textContent = '🔴 Desconectado';
+            statusEl.className = 'status desconectado';
+        };
+    </script>
+</body>
+</html>

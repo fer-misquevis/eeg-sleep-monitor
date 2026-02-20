@@ -1,0 +1,15 @@
+# EEG Sleep Monitor - Dependências Python
+
+# Framework web
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+
+# Processamento de sinais
+numpy==1.26.3
+scipy==1.12.0
+
+# Lab Streaming Layer
+pylsl==1.16.2
+
+# Utilitários
+python-multipart==0.0.6
