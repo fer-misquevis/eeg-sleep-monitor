@@ -40,22 +40,33 @@ def estimate_sleep_stage(delta, theta, alpha, beta):
         return "Unknown"
     
     # Proporções normalizadas
-    delta_ratio = delta / total
-    theta_ratio = theta / total
-    alpha_ratio = alpha / total
-    beta_ratio = beta / total
+    delta_ratio = delta
+    theta_ratio = theta
+    alpha_ratio = alpha
+    beta_ratio = beta
     
-    # Lógica de classificação
-    if delta_ratio > 0.5:
+    # Lógica de classificação baseada em ratios de potência por banda
+    # Delta: 0.5–4 Hz | Theta: 4–8 Hz | Alpha: 8–13 Hz | Beta: 13–30 Hz | Gamma: >30 Hz
+
+    if delta_ratio > 0.50 and delta_ratio < 4.0:
+        # Delta dominante = sono profundo
         return "N3 (Profundo)"
-    elif delta_ratio > 0.3 and theta_ratio > 0.3:
+
+    elif theta_ratio > 4.1 and theta_ratio < 8.0:
+        # Delta elevado com theta presente = sono moderado
         return "N2 (Moderado)"
-    elif theta_ratio > 0.4 and alpha_ratio < 0.2:
-        if beta_ratio > 0.15:
+
+    elif alpha_ratio > 8.1 and alpha_ratio < 13.0:
+        # Theta dominante, alpha baixo = sonolência/sono leve
+        if beta_ratio > 13.1 and beta_ratio < 30.0:
+            # Beta elevado junto com theta = característica REM
             return "REM"
         else:
-            return "N1 (Leve)"
-    elif beta_ratio > 0.25 or alpha_ratio > 0.25:
-        return "Acordado"
+            return "Acordado"
+
+    #elif beta_ratio > 0.30 or gamma_ratio > 0.15:
+        # Beta/Gamma dominantes = foco ativo ou alerta
+    #    return "Acordado (Alerta)"
+
     else:
         return "N1 (Leve)"
