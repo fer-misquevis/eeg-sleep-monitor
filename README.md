@@ -6,7 +6,7 @@ Sistema de monitoramento em tempo real de sinais EEG para análise e classifica�
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.109-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-## 📋 Índice
+## Índice
 
 - [Sobre](#sobre)
 - [Funcionalidades](#funcionalidades)
@@ -18,7 +18,7 @@ Sistema de monitoramento em tempo real de sinais EEG para análise e classifica�
 - [Ciência por Trás](#ciência-por-trás)
 - [Desenvolvimento](#desenvolvimento)
 
-## 🎯 Sobre
+## Sobre
 
 O **EEG Sleep Monitor** é uma aplicação Python que captura sinais EEG em tempo real de um Muse headband via Lab Streaming Layer (LSL), processa esses sinais para extrair características relevantes, e classifica automaticamente os estágios de sono.
 
@@ -34,24 +34,24 @@ O **EEG Sleep Monitor** é uma aplicação Python que captura sinais EEG em temp
 
 ### Análise de Sinais
 
-- 📊 **Análise espectral**: Calcula potência em bandas de frequência via Welch PSD
-- 🌀 **Detecção de spindles**: Identifica oscilações sigma (11-16 Hz) do estágio N2
-- 😴 **Classificação de sono**: Estima estágios baseado em proporções de bandas
+-  **Análise espectral**: Calcula potência em bandas de frequência via Welch PSD
+-  **Detecção de spindles**: Identifica oscilações sigma (11-16 Hz) do estágio N2
+-  **Classificação de sono**: Estima estágios baseado em proporções de bandas
 
 ### Interface Web
 
-- 🎨 **Dashboard em tempo real**: Visualização moderna com Chart.js
-- 📈 **Gráficos interativos**: Plotagem contínua das 4 bandas principais
-- 🔔 **Alertas visuais**: Indicador animado para detecção de spindles
-- 📱 **Design responsivo**: Interface adaptável para diferentes telas
+-  **Dashboard em tempo real**: Visualização moderna com Chart.js
+-  **Gráficos interativos**: Plotagem contínua das 4 bandas principais
+-  **Alertas visuais**: Indicador animado para detecção de spindles
+-  **Design responsivo**: Interface adaptável para diferentes telas
 
 ### API
 
-- ⚡ **WebSocket**: Stream de dados em tempo real (atualização a cada 3s)
-- 🔌 **REST endpoints**: Informações sobre status e configuração
-- 📡 **FastAPI**: Framework moderno com documentação automática
+-  **WebSocket**: Stream de dados em tempo real (atualização a cada 3s)
+-  **REST endpoints**: Informações sobre status e configuração
+-  **FastAPI**: Framework moderno com documentação automática
 
-## 🔧 Requisitos
+##  Requisitos
 
 ### Hardware
 
@@ -73,7 +73,7 @@ scipy==1.12.0
 pylsl==1.16.2
 ```
 
-## 📦 Instalação
+##  Instalação
 
 ### 1. Clone o repositório
 
@@ -189,7 +189,7 @@ FastAPI WebSocket
 Dashboard Web (Chart.js)
 ```
 
-## 🌐 API Endpoints
+## API Endpoints
 
 ### REST
 
@@ -231,7 +231,7 @@ FastAPI gera documentação automática:
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
-## 🧪 Ciência por Trás
+## Ciência por Trás
 
 ### Bandas de Frequência EEG
 
@@ -324,7 +324,7 @@ Retorna: "Acordado" | "N1" | "N2" | "N3" | "REM"
 4. Adicionar ao WebSocket output
 5. Atualizar dashboard em `static/index.html`
 
-## 📊 Parâmetros Ajustáveis
+## Parâmetros Ajustáveis
 
 ### `src/main.py`
 
@@ -391,16 +391,6 @@ muselsl stream
 
 MIT License - veja LICENSE para detalhes
 
-## 👥 Contribuindo
-
-Contribuições são bem-vindas! Por favor:
-
-1. Fork o projeto
-2. Crie uma branch (`git checkout -b feature/nova-funcionalidade`)
-3. Commit suas mudanças (`git commit -am 'Adiciona nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/nova-funcionalidade`)
-5. Abra um Pull Request
-
 ## 📚 Referências
 
 - [Rechtschaffen & Kales (1968)](https://en.wikipedia.org/wiki/Rechtschaffen_and_Kales) - Critérios clássicos de staging
@@ -412,4 +402,5 @@ Contribuições são bem-vindas! Por favor:
 ---
 
 **Aviso**: Este software é para fins educacionais e de pesquisa. Não deve ser usado para diagnóstico médico.
+
 
